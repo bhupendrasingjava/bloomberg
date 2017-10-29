@@ -2,7 +2,7 @@
 
 ## In order to download project, go to [https://github.com/bhupendrasingjava/bloomberg.git] 
 
-This is a simple test project I used to show some Morphia features at MongoUK2011.
+This is a simple test project I used to upload CSV files and insert in DB within 5 seconds.
 
 ## Entities
 The basic structure of the Entities looks like this
