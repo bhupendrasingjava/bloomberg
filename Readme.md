@@ -1,6 +1,6 @@
 # Bloomberg Data Warehouse Sample project using Java 8 and Morphia (JPA for Mongo DB)
 
-## In order to download project, go to [https://github.com/xeraa/morphia-demo](https://github.com/xeraa/morphia-demo) 
+## In order to download project, go to [https://github.com/bhupendrasingjava/bloomberg.git] 
 
 This is a simple test project I used to show some Morphia features at MongoUK2011.
 
@@ -19,5 +19,4 @@ The basic structure of the Entities looks like this
 An IDE like Eclipse or IntelliJ is highly recommended but not required. I used IntelliJ idea 2017.1.1
 
 
-## Getting started
 
