@@ -1,12 +1,18 @@
 package org.bloomberg.data.warehouse;
 
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodProcess;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
 import org.apache.commons.io.IOUtils;
 import org.bloomberg.data.warehouse.config.ApplicationContextConfig;
 import org.bloomberg.data.warehouse.config.MongoDBConfig;
 import org.bloomberg.data.warehouse.service.WarehouseService;
-import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mongodb.morphia.Datastore;
@@ -18,14 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Bhupendra.Singh on 10/28/2017.
@@ -40,56 +42,62 @@ public class BloombergTest {
     @Autowired
     private WarehouseService warehouseService;
 
+    private static final String MONGO_HOST = "127.0.0.1";
+    private static final int MONGO_PORT = 27017;
+    private static final String IN_MEM_CONNECTION_URL = MONGO_HOST + ":" + MONGO_PORT;
+
+    private static MongodExecutable mongodExe;
+    private static MongodProcess mongod;
+
+    /**
+     * Start in-memory Mongo DB process
+     */
+    @BeforeClass
+    public static void setup() throws Exception {
+        System.out.println("start setup...");
+        MongodStarter runtime = MongodStarter.getDefaultInstance();
+        mongodExe = runtime.prepare(new MongodConfig(Version.V2_0_5, MONGO_PORT, Network.localhostIsIPv6()));
+        mongod = mongodExe.start();
+    }
+
+
     /**
      * Get our Mongo DB configration implementation and ensure it's not null.
      */
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("Start setUp()");
         datastore = MongoDBConfig.instance().getDatabase();
         assertNotNull(datastore);
+        System.out.println("End setUp()");
     }
-
-    /**
-     * After finishing the test, clean up the database. This is important to
-     * allow multiple test runs in combination with unique key constraints.
-     */
-    @After
-    public void tearDown() throws Exception {
-       // warehouseService.clearData();
-    }
-
-    /**
-     * Process CSV file
-     */
 
     @Test
-    public void persistCSVFile() throws IOException {
-        File file = new File("src/test/resources/order.csv");
+    public void testAvalidateFileForProcessing() throws IOException {
+        String fileName = "ordertest.csv";
+        Boolean isProcessed = warehouseService.getByFilename(fileName);
+        assertEquals(false, isProcessed);
+
+    }
+
+    @Test
+    public void testBpersistCSVFile() throws IOException {
+        File file = new File("src/test/resources/ordertest.csv");
         FileInputStream input = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/csv", IOUtils.toByteArray(input));
         Long id = warehouseService.processFile(multipartFile);
+        System.out.println("ID value=" + id);
         assertNotNull("An id should have been generated when saving the entity", id);
     }
 
     @Test
-    public void validateFileForProcessing() throws IOException {
-       String fileName = "orders.csv";
-       Boolean isProcessed = warehouseService.getByFilename(fileName);
-       assertEquals(false, isProcessed);
-
-    }
-
-
-    /**
-     * To test after running orders.csv first time, please comment warehouseService.clearData() and uncomment this test.
-     * @throws IOException
-     */
-    //@Test
-    public void validateAlreadyProcessedFile() throws IOException {
-        String fileName = "orders.csv";
+    public void testCvalidateAlreadyProcessedFile() throws IOException {
+        String fileName = "ordertest.csv";
         Boolean isProcessed = warehouseService.getByFilename(fileName);
         assertEquals(true, isProcessed);
 
     }
+
+
 }

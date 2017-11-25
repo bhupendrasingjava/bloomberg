@@ -23,9 +23,7 @@ public class MongoDBConfig {
     private MongoDBConfig() {
         MongoClientOptions mongoOptions = MongoClientOptions.builder().socketTimeout(60000)
                 .connectTimeout(1200000).build(); // SocketTimeout: 60s, ConnectionTimeout: 20min
-        MongoClient mongoClient;
-        mongoClient = new MongoClient(new ServerAddress("127.0.0.1", 27017), mongoOptions);
-
+        MongoClient  mongoClient = new MongoClient(new ServerAddress("127.0.0.1", 27017), mongoOptions);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         datastore = new Morphia().mapPackage(FileDetails.class.getPackage().getName())
                 .createDatastore(mongoClient, DB_NAME);
