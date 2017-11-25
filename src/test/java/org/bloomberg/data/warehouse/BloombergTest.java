@@ -54,7 +54,7 @@ public class BloombergTest {
      */
     @BeforeClass
     public static void setup() throws Exception {
-        System.out.println("start setup...");
+        System.out.println("starting in-memory mongo DB instance...");
         MongodStarter runtime = MongodStarter.getDefaultInstance();
         mongodExe = runtime.prepare(new MongodConfig(Version.V2_0_5, MONGO_PORT, Network.localhostIsIPv6()));
         mongod = mongodExe.start();
@@ -62,7 +62,7 @@ public class BloombergTest {
 
 
     /**
-     * Get our Mongo DB configration implementation and ensure it's not null.
+     * Get our Mongo DB configuration implementation and ensure it's not null.
      */
 
     @Before
@@ -87,7 +87,6 @@ public class BloombergTest {
         FileInputStream input = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/csv", IOUtils.toByteArray(input));
         Long id = warehouseService.processFile(multipartFile);
-        System.out.println("ID value=" + id);
         assertNotNull("An id should have been generated when saving the entity", id);
     }
 
